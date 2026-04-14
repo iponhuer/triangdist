@@ -1,0 +1,1 @@
+#' @title Distribucion Triangular
