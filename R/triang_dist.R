@@ -39,18 +39,18 @@ return(res)
 
 #' @rdname triangular
 #' @export
-ptriang <- function(x, min, max, mode) {
+ptriang <- function(q, min, max, mode) {
   if (any(min > max)) stop("min cannot be greater than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
 
-  res <- numeric(length(x))
-  res[x > max] <- 1 #if it is bigger than max means that cdf is 1
+  res <- numeric(length(q))
+  res[q > max] <- 1 #if it is bigger than max means that cdf is 1
 
-  izq <- x >= min & x <= mode
-  der <- x > mode & x <= max
+  izq <- q >= min & q <= mode
+  der <- q > mode & q <= max
 
-  res[izq] <- (x[izq] - min)^2 / ((max-min) * (mode-min))
-  res[der] <- 1 - (max - x[der])^2 / ((max-min) * (max-mode))
+  res[izq] <- (q[izq] - min)^2 / ((max-min) * (mode-min))
+  res[der] <- 1 - (max - q[der])^2 / ((max-min) * (max-mode))
 
   return(res)
 
@@ -58,12 +58,12 @@ ptriang <- function(x, min, max, mode) {
 
 #' @rdname triangular
 #' @export
-qtriang <- function(x, min, max, mode) {
+qtriang <- function(p, min, max, mode) {
   if (any(min > max)) stop("min cannot be greater than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
-  if (any(x < 0 | x > 1)) stop("x must be between 0 and 1")
+  if (any(p < 0 | x > 1)) stop("p must be between 0 and 1")
 
-  res <- numeric(length(x))
+  res <- numeric(length(p))
   p_crit <- (mode-min) / (max-min) #cdf at the mode
 
   #If the probability is less than p_crit the result will be in the first half of the triangle
@@ -82,11 +82,8 @@ qtriang <- function(x, min, max, mode) {
 
 }
 
-
-
-
 #' @rdname triangular
 #' @export
 rtriang <- function(n, min, max, mode){
-
+  return(qtriang(runif(n), min, max, mode))
 }
