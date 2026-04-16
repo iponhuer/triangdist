@@ -56,10 +56,6 @@ ptriang <- function(x, min, max, mode) {
 
 }
 
-
-
-
-
 #' @rdname triangular
 #' @export
 qtriang <- function(x, min, max, mode) {
@@ -67,7 +63,22 @@ qtriang <- function(x, min, max, mode) {
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
   if (any(x < 0 | x > 1)) stop("x must be between 0 and 1")
 
+  res <- numeric(length(x))
+  p_crit <- (mode-min) / (max-min) #cdf at the mode
 
+  #If the probability is less than p_crit the result will be in the first half of the triangle
+  #This is the one that goes up
+
+  #If it is higher the result will be in the second half
+  #This is the one that goes down
+
+  lower <- p <= p_crit
+  upper <- p > p_crit
+
+  res[lower] <- min + sqrt(p[lower] * (max - min) * (mode - min))
+  res[upper] <- max - sqrt((1 - p[upper]) * (max - min) * (max - mode))
+
+  return(res)
 
 }
 
