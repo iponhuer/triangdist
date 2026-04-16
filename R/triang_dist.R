@@ -19,7 +19,20 @@ if (any(mode < min | mode > max)) stop("mode must be between min and max")
 
 res <- numeric(length(x))
 
+#Upward slope, between min and mode
+up <- x >= min & x < mode
+res[up] <- (2 * (x[up] - min)) / ((max - min) * (mode - min))
 
+#At the mode
+#Assigns the value of the maximum height only when x is equal to the mode
+#The sum must be 1
+res[x == mode] <- 2 / (max - min)
+
+#Downward slope, between mode and max
+down <- x > mode & x <= max
+res[down] <- (2 * (max - x[down])) / ((max - min) * (max - mode))
+
+return(res)
 
 }
 
