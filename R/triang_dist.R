@@ -11,3 +11,5 @@
 #' @name triangular
 #'
 #'
+#' @rdname triangular
+#' @export
