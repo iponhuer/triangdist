@@ -13,3 +13,9 @@
 #'
 #' @rdname triangular
 #' @export
+#' dtriang <- function(x, min, max, mode) {
+if (any(min > max)) stop("min cannot be greater than max")
+if (any(mode < min | mode > max)) stop("mode must be between min and max")
+
+
+}
