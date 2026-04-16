@@ -1,7 +1,8 @@
 #' @title Triangular Distribution
-#' @description Density, distribution function, quantile function and random generation
-#' for the triangular distribution.
+#' @description Density, distribution function, quantile function and
+#' random generation for the triangular distribution.
 #'
+#' @importFrom stats runif
 #' @param x,q Vector of quantiles.
 #' @param p Vector of probabilities.
 #' @param n Number of observations.
@@ -13,26 +14,26 @@
 #'
 #' @rdname triangular
 #' @export
-dtriang <- function(x, min, max, mode){
-if (any(min > max)) stop("min cannot be greater than max")
-if (any(mode < min | mode > max)) stop("mode must be between min and max")
+dtriang <- function(x, min, max, mode) {
+  if (any(min > max)) stop("min cannot be greater than max")
+  if (any(mode < min | mode > max)) stop("mode must be between min and max")
 
-res <- numeric(length(x))
+  res <- numeric(length(x))
 
-#Upward slope, between min and mode
-up <- x >= min & x < mode
-res[up] <- (2*(x[up] - min)) / ((max-min)*(mode-min))
+  #Upward slope, between min and mode
+  up <- x >= min & x < mode
+  res[up] <- (2 * (x[up] - min)) / ((max - min) * (mode - min))
 
-#At the mode
-#Assigns the value of the maximum height only when x is equal to the mode
-#The sum must be 1
-res[x == mode] <- 2 /(max - min)
+  #At the mode
+  #Assigns the value of the maximum height only when x is equal to the mode
+  #The sum must be 1
+  res[x == mode] <- 2 / (max - min)
 
-#Downward slope, between mode and max
-down <- x > mode & x <= max
-res[down] <- (2*(max - x[down])) / ((max-min) * (max-mode))
+  #Downward slope, between mode and max
+  down <- x > mode & x <= max
+  res[down] <- (2 * (max - x[down])) / ((max - min) * (max - mode))
 
-return(res)
+  res
 
 }
 
@@ -49,10 +50,10 @@ ptriang <- function(q, min, max, mode) {
   izq <- q >= min & q <= mode
   der <- q > mode & q <= max
 
-  res[izq] <- (q[izq] - min)^2 / ((max-min) * (mode-min))
-  res[der] <- 1 - (max - q[der])^2 / ((max-min) * (max-mode))
+  res[izq] <- (q[izq] - min) ^ 2 / ((max - min) * (mode - min))
+  res[der] <- 1 - (max - q[der]) ^ 2 / ((max - min) * (max - mode))
 
-  return(res)
+  res
 
 }
 
@@ -61,16 +62,10 @@ ptriang <- function(q, min, max, mode) {
 qtriang <- function(p, min, max, mode) {
   if (any(min > max)) stop("min cannot be greater than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
-  if (any(p < 0 | x > 1)) stop("p must be between 0 and 1")
+  if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
 
   res <- numeric(length(p))
-  p_crit <- (mode-min) / (max-min) #cdf at the mode
-
-  #If the probability is less than p_crit the result will be in the first half of the triangle
-  #This is the one that goes up
-
-  #If it is higher the result will be in the second half
-  #This is the one that goes down
+  p_crit <- (mode - min) / (max - min) #cdf at the mode
 
   lower <- p <= p_crit
   upper <- p > p_crit
@@ -78,12 +73,12 @@ qtriang <- function(p, min, max, mode) {
   res[lower] <- min + sqrt(p[lower] * (max - min) * (mode - min))
   res[upper] <- max - sqrt((1 - p[upper]) * (max - min) * (max - mode))
 
-  return(res)
+  res
 
 }
 
 #' @rdname triangular
 #' @export
-rtriang <- function(n, min, max, mode){
-  return(qtriang(runif(n), min, max, mode))
+rtriang <- function(n, min, max, mode) {
+  qtriang(runif(n), min, max, mode)
 }
