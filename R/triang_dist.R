@@ -15,23 +15,27 @@
 #' @rdname triangular
 #' @export
 dtriang <- function(x, min, max, mode) {
-  if (any(min > max)) stop("min cannot be greater than max")
+  if (any(min >= max)) stop("min must be strictly less than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
 
   res <- numeric(length(x))
 
-  #Upward slope, between min and mode
-  up <- x >= min & x < mode
-  res[up] <- (2 * (x[up] - min)) / ((max - min) * (mode - min))
+  #Upward slope, between min and mode (skipped when mode == min)
+  if (mode > min) {
+    up <- x >= min & x < mode
+    res[up] <- (2 * (x[up] - min)) / ((max - min) * (mode - min))
+  }
 
   #At the mode
   #Assigns the value of the maximum height only when x is equal to the mode
   #The sum must be 1
   res[x == mode] <- 2 / (max - min)
 
-  #Downward slope, between mode and max
-  down <- x > mode & x <= max
-  res[down] <- (2 * (max - x[down])) / ((max - min) * (max - mode))
+  #Downward slope, between mode and max (skipped when mode == max)
+  if (mode < max) {
+    down <- x > mode & x <= max
+    res[down] <- (2 * (max - x[down])) / ((max - min) * (max - mode))
+  }
 
   res
 
@@ -41,17 +45,23 @@ dtriang <- function(x, min, max, mode) {
 #' @rdname triangular
 #' @export
 ptriang <- function(q, min, max, mode) {
-  if (any(min > max)) stop("min cannot be greater than max")
+  if (any(min >= max)) stop("min must be strictly less than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
 
   res <- numeric(length(q))
-  res[q > max] <- 1 #if it is bigger than max means that cdf is 1
+  res[q >= max] <- 1 #if it is at or above max the cdf is 1
 
-  izq <- q >= min & q <= mode
-  der <- q > mode & q <= max
+  #Left of the mode (degenerate when mode == min: CDF jumps from 0 to value at mode)
+  if (mode > min) {
+    izq <- q >= min & q <= mode
+    res[izq] <- (q[izq] - min) ^ 2 / ((max - min) * (mode - min))
+  }
 
-  res[izq] <- (q[izq] - min) ^ 2 / ((max - min) * (mode - min))
-  res[der] <- 1 - (max - q[der]) ^ 2 / ((max - min) * (max - mode))
+  #Right of the mode (degenerate when mode == max)
+  if (mode < max) {
+    der <- q > mode & q < max
+    res[der] <- 1 - (max - q[der]) ^ 2 / ((max - min) * (max - mode))
+  }
 
   res
 
@@ -60,7 +70,7 @@ ptriang <- function(q, min, max, mode) {
 #' @rdname triangular
 #' @export
 qtriang <- function(p, min, max, mode) {
-  if (any(min > max)) stop("min cannot be greater than max")
+  if (any(min >= max)) stop("min must be strictly less than max")
   if (any(mode < min | mode > max)) stop("mode must be between min and max")
   if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
 
